@@ -17,11 +17,12 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(ein:output-area-inlined-images t)
+ '(lsp-enable-indentation nil)
  '(package-selected-packages
-   '(neotree vscode-icon dired-sidebar ein vterm-toggle vterm use-package ccls nasm-mode flycheck-irony company-irony solarized-theme lsp-mode rust-mode multi-term zop-to-char solarized-theme yaml-mode which-key volatile-highlights undo-tree tide super-save smex smartrep smartparens rjsx-mode rainbow-mode rainbow-delimiters racer projectile prettier-js perspective operate-on-number move-text magit lsp-ui json-mode jedi irony imenu-anywhere ido-completing-read+ hl-todo helm haskell-mode guru-mode go-mode gitignore-mode gitconfig-mode git-timemachine gist geiser flycheck-rust flx-ido expand-region exec-path-from-shell ensime elisp-slime-nav editorconfig easy-kill discover-my-major diminish diff-hl crux counsel company-lsp cmake-mode cargo browse-kill-ring beacon auctex anzu ace-window))
+   '(scala-mode neotree vscode-icon dired-sidebar ein vterm-toggle vterm use-package ccls nasm-mode flycheck-irony company-irony solarized-theme lsp-mode rust-mode multi-term zop-to-char solarized-theme yaml-mode which-key volatile-highlights undo-tree tide super-save smex smartrep smartparens rjsx-mode rainbow-mode rainbow-delimiters racer projectile prettier-js perspective operate-on-number move-text magit lsp-ui json-mode jedi irony imenu-anywhere ido-completing-read+ hl-todo helm haskell-mode guru-mode go-mode gitignore-mode gitconfig-mode git-timemachine gist geiser flycheck-rust flx-ido expand-region exec-path-from-shell ensime elisp-slime-nav editorconfig easy-kill discover-my-major diminish diff-hl crux counsel company-lsp cmake-mode cargo browse-kill-ring beacon auctex anzu ace-window))
  '(persp-mode t)
  '(safe-local-variable-values '((flycheck-disabled-checkers emacs-lisp-checkdoc)))
- '(verilog-align-ifelse t)
+ '(verilog-align-ifelse nil)
  '(verilog-auto-delete-trailing-whitespace t)
  '(verilog-auto-inst-param-value t)
  '(verilog-auto-inst-vector nil)
@@ -75,7 +76,14 @@
 
 (use-package ccls
   :hook ((c-mode c++-mode objc-mode cuda-mode) .
-         (lambda () (require 'ccls) (lsp) (setq c-basic-offset 4) (setq indent-tabs-mode nil)))
+         (lambda ()
+	   (require 'ccls)
+	   (lsp)
+	   (setq c-basic-offset 4)
+	   (setq c-indent-level 4)
+	   (setq indent-tabs-mode nil)
+	   (setq lsp-enable-on-type-formatting nil)
+	   (setq lsp-enable-indentation nil))))
 
 (use-package vterm
   :ensure t)
@@ -89,7 +97,14 @@
   :config (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
           (setq lsp-rust-server 'rust-analyzer))
 
+(use-package avy
+  :ensure t
+  :bind (("M-s" . avy-goto-word-1)))
 
+(use-package scala-mode
+  :ensure t
+  :interpreter
+    ("scala" . scala-mode))
 
 ;;(load-theme 'solarized-dark t)
 (show-paren-mode 1)
@@ -202,3 +217,22 @@
 (require 'neotree)
 (global-set-key [f8] 'neotree-toggle)
 (delete-file "~/Library/Colors/Emacs.clr")
+(setq mac-option-modifier 'meta)
+(setq mac-command-modifier 'super)
+(global-unset-key "\C-z")
+(global-set-key "\C-z" 'undo)
+
+(global-set-key (kbd "s-c") 'kill-ring-save)
+(global-set-key (kbd "s-v") 'yank)
+
+
+(defun toggle-fullscreen ()
+  "Toggle full screen"
+  (interactive)
+  (set-frame-parameter
+     nil 'fullscreen
+     (when (not (frame-parameter nil 'fullscreen)) 'fullboth)))
+
+(global-set-key [f9] 'toggle-fullscreen)
+(setq ns-use-native-fullscreen t)
+
